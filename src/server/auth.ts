@@ -8,7 +8,7 @@ import { type Adapter } from "next-auth/adapters";
 import GoogleProvider from "next-auth/providers/google";
 
 import { env } from "@/env";
-import { db } from "@/server/db";
+import { prisma } from "@/lib/prisma";
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -47,14 +47,14 @@ export const authOptions: NextAuthOptions = {
     }),
     signIn: async ({ user, account, profile }) => {
       if (account?.provider === "google") {
-        const existingUser = await db.user.findUnique({
+        const existingUser = await prisma.user.findUnique({
           // @ts-ignore
           where: { email: user.email },
         });
 
         if (!existingUser) {
           // Create a new user if one doesn't exist
-          await db.user.create({
+          await prisma.user.create({
             data: {
               email: user.email,
               name: user.name,
@@ -72,7 +72,7 @@ export const authOptions: NextAuthOptions = {
           return true;
         } else {
           // If user exists but doesn't have a Google account linked
-          const existingAccount = await db.account.findFirst({
+          const existingAccount = await prisma.account.findFirst({
             where: {
               userId: existingUser.id,
               provider: "google",
@@ -81,7 +81,7 @@ export const authOptions: NextAuthOptions = {
 
           if (!existingAccount) {
             // Link the Google account to the existing user
-            await db.account.create({
+            await prisma.account.create({
               // @ts-ignore
               data: {
                 userId: existingUser.id,
@@ -97,7 +97,7 @@ export const authOptions: NextAuthOptions = {
       return true;
     },
   },
-  adapter: PrismaAdapter(db) as Adapter,
+  adapter: PrismaAdapter(prisma) as Adapter,
   providers: [
     GoogleProvider({
       clientId: env.GOOGLE_CLIENT_ID,

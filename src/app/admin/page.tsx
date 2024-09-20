@@ -18,10 +18,13 @@ export default async function DashboardLayout({
   return (
     <div className="min-h-screen bg-gray-100">
       <main className="container mx-auto py-8">
-        <div className="mb-6 flex items-center justify-center gap-3">
+        <div className="flex-col gap-2 p-4">
           <h1 className="text-3xl font-bold text-black">Dashboard</h1>
           <Link href="/admin/posts">
-            <Button className="bg-blue-500 text-white">View Posts</Button>
+            <div className="text-black">View Posts</div>
+          </Link>
+          <Link href="/admin/posts/create-post">
+            <div className="text-black">Create Post</div>
           </Link>
         </div>
         {children}

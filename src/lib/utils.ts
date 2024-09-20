@@ -1,35 +1,16 @@
-import { clsx, type ClassValue } from "clsx";
+import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
-
-// Remove the Supabase import
-// import { createClient } from "@supabase/supabase-js"
-
-// Remove the supabaseClient initialization if it's present
-// export const supabaseClient = createClient(
-//   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-//   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-// )
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export const truncateString = (string: string) => {
-  return string.slice(0, 60) + "...";
-};
+export const formatDate = (dateToFormat: Date) => {
+  const date = new Date(dateToFormat);
 
-export const validateURLString = (url: string) => {
-  const youtubeRegex = new RegExp("www.youtube.com");
+  const day = String(date.getDate()).padStart(2, "0");
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const year = date.getFullYear();
 
-  if (youtubeRegex.test(url)) {
-    return {
-      url,
-      type: "YOUTUBE",
-    };
-  } else {
-    return {
-      url: undefined,
-      type: "IMAGE",
-    };
-  }
+  return `${day}/${month}/${year}`;
 };

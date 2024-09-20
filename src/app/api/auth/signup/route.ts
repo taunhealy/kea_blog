@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { SignUpSchema } from "@/components/forms/sign-up/schema";
-import { db } from "@/server/db";
+import { prisma } from "@/lib/prisma";
 import bcrypt from "bcrypt"; // Import bcrypt for hashing
 
 export async function POST(request: Request) {
@@ -9,14 +9,14 @@ export async function POST(request: Request) {
     const validatedData = SignUpSchema.parse(body);
 
     // Check if the user already exists
-    const existingUser = await db.user.findUnique({
+    const existingUser = await prisma.user.findUnique({
       where: { email: validatedData.email },
     });
 
     if (existingUser) {
       return NextResponse.json(
         { error: "User already exists" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -24,7 +24,7 @@ export async function POST(request: Request) {
     const hashedPasscode = await bcrypt.hash(validatedData.password, 10); // 10 is the salt rounds
 
     // Create the user in the database
-    const newUser = await db.user.create({
+    const newUser = await prisma.user.create({
       data: {
         email: validatedData.email,
         password: hashedPasscode, // Changed from passcode to password
@@ -36,13 +36,13 @@ export async function POST(request: Request) {
         message: "User registered successfully",
         user: newUser,
       },
-      { status: 201 }
+      { status: 201 },
     );
   } catch (error) {
     console.error("Signup error:", error);
     return NextResponse.json(
       { error: "Invalid data or server error", details: error }, // Include details for debugging
-      { status: 400 }
+      { status: 400 },
     );
   }
 }

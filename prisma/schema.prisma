@@ -15,16 +15,20 @@ datasource db {
 }
 
 model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
+  id          Int      @id @default(autoincrement())
+  title       String
+  subheading  String?
+  content     String
+  quote       String?
+  tags        String[] // Defined as an array of strings
+  slug        String   @unique
+  userId      String
+  published   Boolean  @default(false)
+  date        DateTime @default(now())
+  image       String   @default("https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=1887&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D")
+  user        User     @relation(fields: [userId], references: [id])
 }
+
 
 // Necessary for Next auth
 model Account {

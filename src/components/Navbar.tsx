@@ -8,13 +8,18 @@ const Navbar = () => {
   const { data: session } = useSession();
 
   return (
-    <nav className="flex items-center justify-between bg-gray-800 p-4 text-white">
+    <nav className="flex items-center justify-between bg-gray-800 p-9 text-white">
       <h1 className="text-xl font-bold">My Blog</h1>
       <div>
         {session ? (
-          <Link href="/admin/" className="rounded bg-blue-500 px-4 py-2">
-            Admin Panel
-          </Link>
+          <div className="flex gap-4">
+            <Link href="/posts/" className="px-4 py-2">
+              Posts
+            </Link>
+            <Link href="/admin/" className="rounded bg-blue-500 px-4 py-2">
+              Admin Panel
+            </Link>
+          </div>
         ) : (
           <>
             <Link href="/sign-in" className="rounded bg-blue-500 px-4 py-2">
