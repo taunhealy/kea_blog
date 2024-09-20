@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuth } from "@/api-actions/getAuth";
+import { getServerAuth } from "@/api-actions/getServerAuth";
 
 export async function GET() {
   try {
@@ -28,21 +28,21 @@ export async function GET() {
 
 export async function DELETE(
   request: Request,
-  { params }: { params: { slug: string } },
+  { params }: { params: { slug: string } }
 ) {
   console.log("DELETE request received for slug:", params.slug);
-  const { user } = await getAuth();
-
-  if (!user) {
-    console.log("Unauthorized: No user found");
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const { slug } = params;
-
-  console.log(`Attempting to delete post with slug: ${slug}`);
-
   try {
+    const { user } = await getServerAuth();
+
+    if (!user) {
+      console.log("Unauthorized: No user found");
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const { slug } = params;
+
+    console.log(`Attempting to delete post with slug: ${slug}`);
+
     const post = await prisma.post.findUnique({ where: { slug } });
 
     console.log("Post found:", post);
@@ -62,13 +62,17 @@ export async function DELETE(
     console.log("Post deleted successfully");
     return NextResponse.json(
       { message: "Post deleted successfully" },
-      { status: 200 },
+      { status: 200 }
     );
   } catch (error) {
     console.error("Error deleting post:", error);
     return NextResponse.json(
-      { message: "Error deleting post", error: JSON.stringify(error) },
-      { status: 500 },
+      { 
+        message: "Error deleting post", 
+        error: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack : undefined
+      },
+      { status: 500 }
     );
   }
 }
@@ -77,7 +81,7 @@ export async function PUT(
   request: Request,
   { params }: { params: { slug: string } },
 ) {
-  const { user } = await getAuth();
+  const { user } = await getServerAuth();
 
   if (!user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });

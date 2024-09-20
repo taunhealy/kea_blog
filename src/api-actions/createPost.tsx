@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getAuth } from "@/api-actions/getAuth";
+import { getServerAuth } from "@/api-actions/getServerAuth";
 import { revalidatePath } from "next/cache";
 
 const postSchema = z.object({
@@ -14,7 +14,7 @@ const postSchema = z.object({
 });
 
 export async function createPost(formData: FormData) {
-  const { user } = await getAuth();
+  const { user } = await getServerAuth();
 
   if (!user) {
     return { success: false, error: "User not authenticated" };

@@ -1,12 +1,12 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuth } from "@/api-actions/getAuth";
+import { getServerAuth } from "@/api-actions/getServerAuth";
 
 export async function PUT(
   request: Request,
   { params }: { params: { id: string } },
 ) {
-  const { user } = await getAuth();
+  const { user } = await getServerAuth();
 
   if (!user) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
@@ -34,15 +34,15 @@ export async function DELETE(
   request: Request,
   { params }: { params: { id: string } },
 ) {
-  const { user } = await getAuth();
-
-  if (!user) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const id = parseInt(params.id);
-
   try {
+    const { user } = await getServerAuth();
+
+    if (!user) {
+      return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
+    }
+
+    const id = parseInt(params.id);
+
     await prisma.category.delete({ where: { id } });
     return NextResponse.json(
       { message: "Category deleted successfully" },
