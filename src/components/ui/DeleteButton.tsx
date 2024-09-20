@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useDeletePost } from "@/actions/deletePost";
+import { useDeletePost } from "@/api-actions/deletePost";
 
 const DeleteButton = ({ slug }: { slug: string }) => {
   const { mutate: deletePost, isPending } = useDeletePost();

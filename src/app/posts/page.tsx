@@ -1,5 +1,5 @@
 import React from "react";
-import { getPosts } from "@/actions/getPosts";
+import { getPosts } from "@/api-actions/getPosts";
 import Link from "next/link";
 import {
   Card,
@@ -24,6 +24,16 @@ export default async function PostsPage() {
             </CardHeader>
             <CardContent>
               <p className="text-muted-foreground">{post.subheading}</p>
+              <div className="mt-2">
+                {post.categories.map((category: any) => (
+                  <span
+                    key={category.id}
+                    className="mr-2 rounded bg-gray-200 px-2 py-1 text-xs"
+                  >
+                    {category.name}
+                  </span>
+                ))}
+              </div>
             </CardContent>
             <CardFooter className="mt-auto">
               <div className="flex w-full items-center justify-between">

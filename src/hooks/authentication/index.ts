@@ -26,7 +26,7 @@ export const useAuthSignIn = () => {
     try {
       const result = await signIn("google", {
         redirect: false,
-        callbackUrl: "/dashboard",
+        callbackUrl: "/admin",
       });
       if (result?.error) {
         console.error(result.error);
@@ -85,7 +85,7 @@ export const useAuthSignUp = () => {
           password: values.password,
         });
         if (result?.ok) {
-          router.push("/dashboard");
+          router.push("/admin");
         } else {
           toast("Error", {
             description: "Failed to sign in after registration",
@@ -116,7 +116,7 @@ export const useAuthSignUp = () => {
 
 export const useGoogleAuth = () => {
   const signInWithGoogle = () => {
-    signIn("google", { callbackUrl: "/dashboard" });
+    signIn("google", { callbackUrl: "/admin" });
   };
 
   return { signInWithGoogle };

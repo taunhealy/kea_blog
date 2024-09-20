@@ -2,7 +2,6 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/server/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Button } from "@/components/ui/button";
 
 export default async function DashboardLayout({
   children,
@@ -25,6 +24,9 @@ export default async function DashboardLayout({
           </Link>
           <Link href="/admin/posts/create-post">
             <div className="text-black">Create Post</div>
+          </Link>
+          <Link href="/admin/categories">
+            <div className="text-black">View Categories</div>
           </Link>
         </div>
         {children}

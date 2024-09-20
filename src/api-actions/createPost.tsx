@@ -2,7 +2,7 @@
 
 import { z } from "zod";
 import { prisma } from "@/lib/prisma";
-import { getAuth } from "@/actions/getAuth";
+import { getAuth } from "@/api-actions/getAuth";
 import { revalidatePath } from "next/cache";
 
 const postSchema = z.object({
@@ -25,13 +25,11 @@ export async function createPost(formData: FormData) {
     subheading: formData.get("subheading") as string,
     content: formData.get("content") as string,
     quote: formData.get("quote") as string,
-    tags: (formData.get("tags") as string).split(",").map((tag) => tag.trim()), // This creates an array of strings
+    tags: (formData.get("tags") as string).split(",").map((tag) => tag.trim()),
+    categories: formData.getAll("categories").map(Number),
   };
 
   try {
-    console.log("Post data before parsing:", postData); // Debugging line
-    postSchema.parse(postData);
-
     let slug = postData.title.toLowerCase().replace(/\s+/g, "-");
     let existingPost = await prisma.post.findUnique({ where: { slug } });
     let counter = 1;
@@ -42,17 +40,20 @@ export async function createPost(formData: FormData) {
       counter++;
     }
 
-    await prisma.post.create({
+    const newPost = await prisma.post.create({
       data: {
         ...postData,
         user: { connect: { id: user.id } },
         slug,
+        categories: {
+          connect: postData.categories.map((id) => ({ id })),
+        },
       },
     });
 
     revalidatePath("/posts");
 
-    return { success: true, slug };
+    return { success: true, slug: newPost.slug };
   } catch (error) {
     console.error("Error creating post:", error);
     return { success: false, error: "Failed to create post" };

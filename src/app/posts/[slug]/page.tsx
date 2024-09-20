@@ -3,7 +3,7 @@ import { formatDate } from "@/lib/utils";
 import { ChevronLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getPostBySlug } from "@/actions/getPostBySlug";
+import { getPostBySlug } from "@/api-actions/getPostBySlug";
 
 interface IParams {
   params: { slug: string };

@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import DeleteButton from "@/components/ui/DeleteButton";
 import { useQuery } from "@tanstack/react-query";
-import { getPosts } from "@/actions/getPosts";
+import { getPosts } from "@/api-actions/getPosts";
 
 const PostsPage = () => {
   const {
@@ -41,6 +41,7 @@ const PostsPage = () => {
           <tr>
             <th className="border px-4 py-2">Title</th>
             <th className="border px-4 py-2">Subheading</th>
+            <th className="border px-4 py-2">Categories</th>
             <th className="border px-4 py-2">Actions</th>
           </tr>
         </thead>
@@ -56,6 +57,16 @@ const PostsPage = () => {
                 </Link>
               </td>
               <td className="border px-4 py-2">{post.subheading}</td>
+              <td className="border px-4 py-2">
+                {post.categories.map((category: any) => (
+                  <span
+                    key={category.id}
+                    className="mr-2 rounded bg-gray-200 px-2 py-1 text-xs"
+                  >
+                    {category.name}
+                  </span>
+                ))}
+              </td>
               <td className="flex items-center gap-5 border px-4 py-2">
                 <DeleteButton slug={post.slug} />
               </td>

@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { getAuth } from "@/actions/getAuth";
+import { getAuth } from "@/api-actions/getAuth";
 
 export async function GET() {
   try {
@@ -11,6 +11,7 @@ export async function GET() {
         subheading: true,
         slug: true,
         date: true,
+        categories: true, // Add this line
       },
       orderBy: {
         date: "desc",
@@ -20,7 +21,7 @@ export async function GET() {
   } catch (error) {
     console.error("Error fetching posts:", error);
     return NextResponse.json(
-      { error: "Error fetching posts", details: error },
+      { error: "Error fetching posts" },
       { status: 500 },
     );
   }
