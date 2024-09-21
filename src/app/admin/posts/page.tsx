@@ -1,12 +1,36 @@
 "use client";
 
-import React from "react";
-import Link from "next/link";
-import DeleteButton from "@/components/ui/DeleteButton";
-import { useQuery } from "@tanstack/react-query";
+import React, { useState } from "react";
 import { getPosts } from "@/api-actions/getPosts";
+import Link from "next/link";
+import {
+  Card,
+  CardContent,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { formatDate } from "@/lib/utils";
+import CategoryFilter from "@/components/CategoryFilter";
+import { useQuery } from "@tanstack/react-query";
 
-const PostsPage = () => {
+interface Category {
+  id: number;
+  name: string;
+}
+
+interface Post {
+  id: number;
+  title: string;
+  subheading: string;
+  categories?: Category[];
+  date: string;
+  slug: string;
+}
+
+export default function PostsPage() {
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+
   const {
     data: posts,
     isLoading,
@@ -16,66 +40,80 @@ const PostsPage = () => {
     queryFn: getPosts,
   });
 
-  console.log("Posts data:", posts); // Keep this for debugging
-  console.log("Error:", error); // Keep this for debugging
-
   if (isLoading) return <div>Loading...</div>;
-  if (error)
-    return (
-      <div>
-        Error: {error instanceof Error ? error.message : "An error occurred"}
-      </div>
+  if (error) return <div>Error: {error.message}</div>;
+
+  const categories = Array.from(
+    new Set(posts.flatMap((post: any) => post.categories.map(JSON.stringify))),
+  ).map((category: unknown) => JSON.parse(category as string));
+
+  const handleCategorySelect = (categoryId: number) => {
+    setSelectedCategories((prev) =>
+      prev.includes(categoryId)
+        ? prev.filter((id) => id !== categoryId)
+        : [...prev, categoryId],
     );
-  if (!posts || posts.length === 0) return <div>No posts found.</div>;
+  };
+
+  const handleClearCategories = () => {
+    setSelectedCategories([]);
+  };
+
+  const filteredPosts =
+    selectedCategories.length > 0
+      ? posts.filter((post: any) =>
+          post.categories.some((category: any) =>
+            selectedCategories.includes(category.id),
+          ),
+        )
+      : posts;
 
   return (
-    <div>
-      <h1>Posts</h1>
-      <Link href="/admin/posts/create-post">
-        <button className="mb-4 rounded bg-blue-500 px-4 py-2 text-white">
-          Create Post
-        </button>
-      </Link>
-      <table className="min-w-full border">
-        <thead>
-          <tr>
-            <th className="border px-4 py-2">Title</th>
-            <th className="border px-4 py-2">Subheading</th>
-            <th className="border px-4 py-2">Categories</th>
-            <th className="border px-4 py-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {posts.map((post: any) => (
-            <tr key={post.id}>
-              <td className="border px-4 py-2">
-                <Link
-                  href={`/posts/${post.slug}`}
-                  className="text-blue-600 hover:underline"
-                >
-                  {post.title}
-                </Link>
-              </td>
-              <td className="border px-4 py-2">{post.subheading}</td>
-              <td className="border px-4 py-2">
+    <div className="container mx-auto py-8">
+      <h1 className="mb-6 text-3xl font-bold">Latest Blog Posts</h1>
+      <CategoryFilter
+        categories={categories}
+        selectedCategories={selectedCategories}
+        onCategorySelect={handleCategorySelect}
+        onClearCategories={handleClearCategories}
+      />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+        {filteredPosts.map((post: any) => (
+          <Card key={post.id} className="flex flex-col">
+            <CardHeader>
+              <CardTitle>{post.title}</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground text-white">
+                {post.subheading}
+              </p>
+              <div className="mt-2">
                 {post.categories.map((category: any) => (
                   <span
                     key={category.id}
-                    className="mr-2 rounded bg-gray-200 px-2 py-1 text-xs"
+                    className="mr-2 rounded bg-red-200 px-2 py-1 text-xs text-black"
                   >
                     {category.name}
                   </span>
                 ))}
-              </td>
-              <td className="flex items-center gap-5 border px-4 py-2">
-                <DeleteButton slug={post.slug} />
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              </div>
+            </CardContent>
+            <CardFooter className="mt-auto">
+              <div className="flex w-full items-center justify-between">
+                <span className="text-muted-foreground text-sm">
+                  {formatDate(post.date)}
+                </span>
+                <Link
+                  href={`/posts/${post.slug}`}
+                  className="text-white-500 hover:underline"
+                >
+                  Read more
+                </Link>
+              </div>
+            </CardFooter>
+          </Card>
+        ))}
+      </div>
     </div>
   );
-};
-
-export default PostsPage;
+}

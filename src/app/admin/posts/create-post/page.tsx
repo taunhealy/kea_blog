@@ -1,6 +1,6 @@
 "use client"; // Ensure this component is a client component
 
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { createPost } from "@/api-actions/createPost"; // Import the createPost action
 import { Input } from "@/components/ui/input"; // Adjust the import based on your setup
 import { useRouter } from "next/navigation"; // Import useRouter for client-side routing
@@ -15,6 +15,7 @@ import {
   CardFooter,
 } from "@/components/ui/card"; // Import Card components
 import { Label } from "@/components/ui/label"; // Import Label component
+import { useQuery } from "@tanstack/react-query";
 
 // Add this interface near the top of your file
 interface Category {
@@ -22,16 +23,23 @@ interface Category {
   name: string;
 }
 
+// Add this function to fetch categories
+const fetchCategories = async (): Promise<Category[]> => {
+  const response = await fetch("/api/categories");
+  if (!response.ok) {
+    throw new Error("Failed to fetch categories");
+  }
+  return response.json();
+};
+
 export default function CreatePostPage() {
   const router = useRouter(); // Initialize useRouter
-  const [categories, setCategories] = useState<Category[]>([]);
 
-  useEffect(() => {
-    fetch("/api/categories")
-      .then((response) => response.json())
-      .then((data) => setCategories(data))
-      .catch((error) => console.error("Error fetching categories:", error));
-  }, []);
+  // Use Tanstack Query to fetch categories
+  const { data: categories = [], isLoading, error } = useQuery<Category[]>({
+    queryKey: ["categories"],
+    queryFn: fetchCategories,
+  });
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -45,6 +53,9 @@ export default function CreatePostPage() {
       console.error(result.error);
     }
   };
+
+  if (isLoading) return <div>Loading categories...</div>;
+  if (error) return <div>Error loading categories: {error.message}</div>;
 
   return (
     <Card className="mx-auto mt-8 max-w-2xl">
