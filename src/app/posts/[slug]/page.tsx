@@ -12,8 +12,10 @@ interface IParams {
 export default async function Page({ params }: IParams) {
   const { slug } = params;
 
+  // await waits for the data to be fetched before rendering
   const post = await getPostBySlug(slug);
 
+  // if the post is not found, return a 404 page (Next.js will automatically render the not-found.tsx file)
   if (!post) {
     notFound();
   }

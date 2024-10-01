@@ -15,9 +15,9 @@ const categorySchema = z.object({
 type CategoryFormData = z.infer<typeof categorySchema>;
 
 export default function CreateCategoryForm({
-  onCategoryCreated,
+  onCategoryCreated,  // This is the destructured parameter
 }: {
-  onCategoryCreated: () => void;
+  onCategoryCreated: () => void;  // This is the type definition
 }) {
   const [isLoading, setIsLoading] = useState(false);
   const {

@@ -1,36 +1,11 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import { getPosts } from "@/api-actions/getPosts";
-import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import { formatDate } from "@/lib/utils";
-import CategoryFilter from "@/components/CategoryFilter";
 import { useQuery } from "@tanstack/react-query";
+import PostsGrid from "@/components/PostsGrid";
 
-interface Category {
-  id: number;
-  name: string;
-}
-
-interface Post {
-  id: number;
-  title: string;
-  subheading: string;
-  categories?: Category[];
-  date: string;
-  slug: string;
-}
-
-export default function PostsPage() {
-  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
-
+export default function AdminPostsPage() {
   const {
     data: posts,
     isLoading,
@@ -47,73 +22,10 @@ export default function PostsPage() {
     new Set(posts.flatMap((post: any) => post.categories.map(JSON.stringify))),
   ).map((category: unknown) => JSON.parse(category as string));
 
-  const handleCategorySelect = (categoryId: number) => {
-    setSelectedCategories((prev) =>
-      prev.includes(categoryId)
-        ? prev.filter((id) => id !== categoryId)
-        : [...prev, categoryId],
-    );
-  };
-
-  const handleClearCategories = () => {
-    setSelectedCategories([]);
-  };
-
-  const filteredPosts =
-    selectedCategories.length > 0
-      ? posts.filter((post: any) =>
-          post.categories.some((category: any) =>
-            selectedCategories.includes(category.id),
-          ),
-        )
-      : posts;
-
   return (
     <div className="container mx-auto py-8">
       <h1 className="mb-6 text-3xl font-bold">Latest Blog Posts</h1>
-      <CategoryFilter
-        categories={categories}
-        selectedCategories={selectedCategories}
-        onCategorySelect={handleCategorySelect}
-        onClearCategories={handleClearCategories}
-      />
-      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {filteredPosts.map((post: any) => (
-          <Card key={post.id} className="flex flex-col">
-            <CardHeader>
-              <CardTitle>{post.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <p className="text-muted-foreground text-white">
-                {post.subheading}
-              </p>
-              <div className="mt-2">
-                {post.categories.map((category: any) => (
-                  <span
-                    key={category.id}
-                    className="mr-2 rounded bg-red-200 px-2 py-1 text-xs text-black"
-                  >
-                    {category.name}
-                  </span>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter className="mt-auto">
-              <div className="flex w-full items-center justify-between">
-                <span className="text-muted-foreground text-sm">
-                  {formatDate(post.date)}
-                </span>
-                <Link
-                  href={`/posts/${post.slug}`}
-                  className="text-white-500 hover:underline"
-                >
-                  Read more
-                </Link>
-              </div>
-            </CardFooter>
-          </Card>
-        ))}
-      </div>
+      <PostsGrid posts={posts} categories={categories} />
     </div>
   );
 }

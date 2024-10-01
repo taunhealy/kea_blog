@@ -10,7 +10,9 @@ interface Category {
 
 interface CategoryFilterProps {
   categories: Category[];
+  // selectedCategories is an array of numbers passed from PostsGrid.tsx
   selectedCategories: number[];
+  // void - the function is called for its side effects rather than for a return value.
   onCategorySelect: (categoryId: number) => void;
   onClearCategories: () => void;
 }
@@ -23,6 +25,8 @@ export default function CategoryFilter({
 }: CategoryFilterProps) {
   return (
     <div className="mb-4">
+      // the actual implementation of onClearCategories is not defined within
+      this component. // It's defined in the parent component PostsGrid.tsx
       <button
         onClick={onClearCategories}
         className={`mr-2 rounded px-3 py-1 ${
