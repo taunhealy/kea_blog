@@ -19,8 +19,8 @@ export default async function DashboardLayout({
       <main className="container mx-auto py-8">
         <div className="flex-col gap-2 p-4">
           <h1 className="text-3xl font-bold text-black">Dashboard</h1>
-          <Link href="/admin/posts">
-            <div className="text-black">View Posts</div>
+          <Link href="/admin/music">
+            <div className="text-black">View Music</div>
           </Link>
           <Link href="/admin/posts/create-post">
             <div className="text-black">Create Post</div>

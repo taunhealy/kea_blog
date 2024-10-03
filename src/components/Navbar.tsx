@@ -13,7 +13,7 @@ const Navbar = () => {
       <div>
         {session ? (
           <div className="flex gap-4">
-            <Link href="/posts/" className="px-4 py-2">
+            <Link href="/music/" className="px-4 py-2">
               Posts
             </Link>
             <Link href="/admin/" className="rounded bg-blue-500 px-4 py-2">

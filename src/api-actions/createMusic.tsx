@@ -13,49 +13,47 @@ const postSchema = z.object({
   tags: z.array(z.string()).optional(), // Updated to expect an array of strings
 });
 
-export async function createPost(formData: FormData) {
+export async function createMusic(formData: FormData) {
   const { user } = await getServerAuth();
 
   if (!user) {
     return { success: false, error: "User not authenticated" };
   }
 
-  const postData = {
+  const musicData = {
     title: formData.get("title") as string,
-    subheading: formData.get("subheading") as string,
+    artist: formData.get("artist") as string,
     content: formData.get("content") as string,
-    quote: formData.get("quote") as string,
-    tags: (formData.get("tags") as string).split(",").map((tag) => tag.trim()),
-    categories: formData.getAll("categories").map(Number),
+    // ... (update other fields as needed)
   };
 
   try {
-    let slug = postData.title.toLowerCase().replace(/\s+/g, "-");
-    let existingPost = await prisma.post.findUnique({ where: { slug } });
+    let slug = musicData.title.toLowerCase().replace(/\s+/g, "-");
+    let existingTrack = await prisma.music.findUnique({ where: { slug } });
     let counter = 1;
 
-    while (existingPost) {
+    while (existingTrack) {
       slug = `${slug}-${counter}`;
-      existingPost = await prisma.post.findUnique({ where: { slug } });
+      existingTrack = await prisma.music.findUnique({ where: { slug } });
       counter++;
     }
 
-    const newPost = await prisma.post.create({
+    const newTrack = await prisma.music.create({
       data: {
-        ...postData,
+        ...musicData,
         user: { connect: { id: user.id } },
         slug,
         categories: {
-          connect: postData.categories.map((id) => ({ id })),
+          connect: musicData.categories.map((id) => ({ id })),
         },
       },
     });
 
-    revalidatePath("/posts");
+    revalidatePath("/music");
 
-    return { success: true, slug: newPost.slug };
+    return { success: true, slug: newTrack.slug };
   } catch (error) {
-    console.error("Error creating post:", error);
-    return { success: false, error: "Failed to create post" };
+    console.error("Error creating music:", error);
+    return { success: false, error: "Failed to create music" };
   }
 }

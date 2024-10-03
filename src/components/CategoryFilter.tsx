@@ -25,8 +25,8 @@ export default function CategoryFilter({
 }: CategoryFilterProps) {
   return (
     <div className="mb-4">
-      // the actual implementation of onClearCategories is not defined within
-      this component. // It's defined in the parent component PostsGrid.tsx
+      {/* The actual implementation of onClearCategories is not defined within
+      this component. It's defined in the parent component PostsGrid.tsx */}
       <button
         onClick={onClearCategories}
         className={`mr-2 rounded px-3 py-1 ${
